@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <Name>Summarize</Name>
+        <Authors>purplexpresso</Authors>
+        <Description>Summarizes all daily actions to a Database, using LLMs.</Description>
+        <UniqueId>purplexpresso.Summarize</UniqueId>
+        <MinimumApiVersion>4.0.0</MinimumApiVersion>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Version>0.1.0</Version>
+        <LangVersion>latest</LangVersion>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <EnableHarmony>true</EnableHarmony>
+        <!--<BundleExtraAssemblies>System, ThirdParty</BundleExtraAssemblies>-->
+        <IgnoreModFilePatterns>\.gguf$</IgnoreModFilePatterns>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.33">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Leclair.Stardew.ModManifestBuilder" Version="2.1.0" />
+        <PackageReference Include="LLamaSharp" Version="0.12.0" />
+        <PackageReference Include="LLamaSharp.Backend.CPU" Version="0.12.0" />
+        <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
+    </ItemGroup>
+
+    <Target Name="ILRepacker" AfterTargets="Build" BeforeTargets="AfterBuild">
+        <!--
+        <PropertyGroup>
+            <WorkingDirectory>$(MSBuildThisFileDirectoryNoRoot)\bin\$(Configuration)</WorkingDirectory>
+        </PropertyGroup>
+        !-->
+        <ItemGroup>
+            <InputAssemblies
+                Include="$(OutputPath)\LLamaSharp.dll" />
+            <InputAssemblies
+                Include="$(OutputPath)\$(AssemblyName).dll" />
+            <InputAssemblies
+                Include="$(OutputPath)\Microsoft.Extensions.Logging.Abstractions.dll" />
+            <InputAssemblies
+                Include="$(OutputPath)\Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
+        </ItemGroup>
+
+        <ILRepack
+            Parallel="true"
+            Internalize="true"
+            InputAssemblies="@(InputAssemblies)"
+            TargetKind="Dll"
+            Wildcards="true"
+            OutputFile="$(OutputPath)\$(AssemblyName).dll"
+        />
+    </Target>
+</Project>
