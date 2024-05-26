@@ -14,9 +14,11 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <EnableHarmony>true</EnableHarmony>
-        <!--<BundleExtraAssemblies>System, ThirdParty</BundleExtraAssemblies>-->
+        <!--<BundleExtraAssemblies>System,
+        ThirdParty</BundleExtraAssemblies>-->
         <IgnoreModFilePatterns>\.gguf$</IgnoreModFilePatterns>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <NoWarn>SKEXP0001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -27,6 +29,9 @@
         <PackageReference Include="Leclair.Stardew.ModManifestBuilder" Version="2.1.0" />
         <PackageReference Include="LLamaSharp" Version="0.12.0" />
         <PackageReference Include="LLamaSharp.Backend.CPU" Version="0.12.0" />
+        <PackageReference Include="LLamaSharp.semantic-kernel" Version="0.12.0" />
+        <PackageReference Include="Microsoft.SemanticKernel.Abstractions" Version="1.13.0" />
+        <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.13.0" />
         <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
     </ItemGroup>
 
@@ -37,23 +42,26 @@
         </PropertyGroup>
         !-->
         <ItemGroup>
-            <InputAssemblies
-                Include="$(OutputPath)\LLamaSharp.dll" />
-            <InputAssemblies
-                Include="$(OutputPath)\$(AssemblyName).dll" />
-            <InputAssemblies
-                Include="$(OutputPath)\Microsoft.Extensions.Logging.Abstractions.dll" />
+            <InputAssemblies Include="$(OutputPath)\Microsoft.Bcl.AsyncInterfaces.dll" />
+            <InputAssemblies Include="$(OutputPath)\Microsoft.Bcl.HashCode.dll" />
+            <InputAssemblies Include="$(OutputPath)\LLamaSharp.dll" />
+            <InputAssemblies Include="$(OutputPath)\LLamaSharp.SemanticKernel.dll" />
+            <InputAssemblies Include="$(OutputPath)\Microsoft.SemanticKernel.Core.dll" />
+            <InputAssemblies Include="$(OutputPath)\Microsoft.SemanticKernel.Abstractions.dll" />
+            <InputAssemblies Include="$(OutputPath)\$(AssemblyName).dll" />
+            <InputAssemblies Include="$(OutputPath)\Microsoft.Extensions.Logging.Abstractions.dll" />
+            <InputAssemblies Include="$(OutputPath)\Microsoft.Extensions.DependencyInjection.dll" />
             <InputAssemblies
                 Include="$(OutputPath)\Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
+            <InputAssemblies Include="$(OutputPath)\System.Diagnostics.DiagnosticSource.dll" />
+            <InputAssemblies Include="$(OutputPath)\System.Text.Json.dll" />
+            <InputAssemblies Include="$(OutputPath)\System.Text.Encodings.Web.dll" />
         </ItemGroup>
 
-        <ILRepack
-            Parallel="true"
-            Internalize="true"
-            InputAssemblies="@(InputAssemblies)"
-            TargetKind="Dll"
-            Wildcards="true"
-            OutputFile="$(OutputPath)\$(AssemblyName).dll"
-        />
+        <ILRepack Parallel="true" Internalize="true" InputAssemblies="@(InputAssemblies)"
+            TargetKind="Dll" Wildcards="true" OutputFile="$(OutputPath)\merged.dll" />
+        <Delete Files="@(InputAssemblies)" />
+        <Move SourceFiles="$(OutputPath)\merged.dll"
+            DestinationFiles="$(OutputPath)\$(AssemblyName).dll" />
     </Target>
 </Project>
