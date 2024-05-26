@@ -48,7 +48,6 @@ public class SemanticKernel
                 "local-embedding",
                 new LLamaSharpEmbeddingGeneration(embeddingModel)
             );
-
         kernel = builder.Build();
         this.monitor = monitor;
     }
