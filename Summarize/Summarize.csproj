@@ -30,31 +30,23 @@
         <PackageReference Include="Leclair.Stardew.ModManifestBuilder" Version="2.1.0" />
         <PackageReference Include="LLamaSharp" Version="0.12.0" />
         <PackageReference Include="LLamaSharp.Backend.CPU" Version="0.12.0" />
-        <PackageReference Include="LLamaSharp.semantic-kernel" Version="0.12.0" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.5" />
-        <PackageReference Include="Microsoft.SemanticKernel.Abstractions" Version="1.13.0" />
-        <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.13.0" />
+        <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.5" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
+        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.8" />
+        <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.8" />
     </ItemGroup>
 
     <Target Name="ILRepacker" AfterTargets="Build" BeforeTargets="AfterBuild">
         <ItemGroup>
-            <InputAssemblies Include="$(OutputPath)\Microsoft.Bcl.AsyncInterfaces.dll" />
-            <InputAssemblies Include="$(OutputPath)\Microsoft.Bcl.HashCode.dll" />
             <InputAssemblies Include="$(OutputPath)\LLamaSharp.dll" />
-            <InputAssemblies Include="$(OutputPath)\LLamaSharp.SemanticKernel.dll" />
-            <InputAssemblies Include="$(OutputPath)\Microsoft.SemanticKernel.Core.dll" />
-            <InputAssemblies Include="$(OutputPath)\Microsoft.SemanticKernel.Abstractions.dll" />
             <InputAssemblies Include="$(OutputPath)\$(AssemblyName).dll" />
+            <InputAssemblies Include="$(OutputPath)\Newtonsoft.Json.dll" />
             <InputAssemblies Include="$(OutputPath)\Microsoft.Extensions.Logging.Abstractions.dll" />
-            <InputAssemblies Include="$(OutputPath)\Microsoft.Extensions.DependencyInjection.dll" />
             <InputAssemblies Include="$(OutputPath)\Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
-            <InputAssemblies Include="$(OutputPath)\System.Diagnostics.DiagnosticSource.dll" />
-            <InputAssemblies Include="$(OutputPath)\System.Text.Json.dll" />
-            <InputAssemblies Include="$(OutputPath)\System.Text.Encodings.Web.dll" />
         </ItemGroup>
 
-        <ILRepack Parallel="true" Internalize="true" InputAssemblies="@(InputAssemblies)" TargetKind="Dll" Wildcards="true" OutputFile="$(OutputPath)\merged.dll" />
+        <ILRepack Parallel="true" Internalize="true" InputAssemblies="@(InputAssemblies)" TargetKind="Dll" OutputFile="$(OutputPath)\merged.dll" />
         <Delete Files="@(InputAssemblies)" />
         <Move SourceFiles="$(OutputPath)\merged.dll" DestinationFiles="$(OutputPath)\$(AssemblyName).dll" />
     </Target>

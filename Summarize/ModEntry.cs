@@ -1,8 +1,10 @@
 ﻿using HarmonyLib;
+using Newtonsoft.Json;
 //using Microsoft.Data.Sqlite;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using Summarize.Managers;
 
 namespace Summarize;
 
@@ -11,24 +13,75 @@ internal sealed class ModEntry : Mod
 {
     internal Harmony Harmony = null!;
 
-    //        internal SqliteConnection connection = null!;
+    internal Database.Database Database = null!;
 
     private ModConfig Config = null!;
 
-    internal World.SemanticKernel? kernel;
+    internal IModHelper helper = null!;
+
+    /// <summary>The current time relative to the game clock.</summary>
+    internal uint currentTime = 0;
+
+    internal CharacterLocationManager characterLocationManager = null!;
 
     public override void Entry(IModHelper helper)
     {
+        this.helper = helper;
         Harmony = new Harmony(ModManifest.UniqueID);
         Config = helper.ReadConfig<ModConfig>();
+        Summarize.Database.Database.SetupSqlite(helper.DirectoryPath);
+        characterLocationManager = new(Monitor);
         helper.Events.GameLoop.GameLaunched += GameLaunched;
+        //helper.Events.GameLoop.UpdateTicked += UpdateTicked;
+        helper.Events.GameLoop.OneSecondUpdateTicked += OneSecondUpdateTicked;
+        helper.Events.World.NpcListChanged += NpcListChanged;
+        helper.Events.GameLoop.SaveLoaded += SaveLoaded;
+        helper.Events.GameLoop.DayStarted += DayStarted;
+        helper.Events.GameLoop.DayEnding += DayEnding;
     }
 
-    private void GameLaunched(object? sender, GameLaunchedEventArgs args)
+    private void GameLaunched(object? sender, GameLaunchedEventArgs args) { }
+
+    private void OneSecondUpdateTicked(object? sender, OneSecondUpdateTickedEventArgs e)
     {
-        LoadLLM();
+        if (characterLocationManager.events.Count > 0)
+        {
+            var obj = characterLocationManager.events.Dequeue();
+            Monitor.Log(JsonConvert.SerializeObject(obj));
+        }
     }
 
+    private void SaveLoaded(object? sender, SaveLoadedEventArgs e)
+    {
+        var savePath =
+            Constants.CurrentSavePath ?? throw new InvalidOperationException("Save path is null.");
+        Database = new(savePath, Monitor);
+    }
+
+    private void DayStarted(object? sender, DayStartedEventArgs e)
+    {
+        characterLocationManager.InitializeDay();
+    }
+
+    private void DayEnding(object? sender, DayEndingEventArgs e)
+    {
+        characterLocationManager.EndDay();
+    }
+
+    private void NpcListChanged(object? sender, NpcListChangedEventArgs e)
+    {
+        var location = e.Location;
+        // foreach (var npc in e.Removed)
+        // {
+        //     characterLocationManager.MarkLeft(npc, location);
+        // }
+        foreach (var npc in e.Added)
+        {
+            characterLocationManager.SetLocation(npc, location);
+        }
+    }
+
+    /*
     private void LoadLLM()
     {
         Monitor.Log("Loading LLama...");
@@ -45,7 +98,6 @@ internal sealed class ModEntry : Mod
             Monitor.Log($"Embedding file not found: {embeddingPath}", LogLevel.Error);
             return;
         }
-        kernel = new World.SemanticKernel(modelPath, embeddingPath, Config.ContextSize, Monitor);
         Monitor.Log("LLama loaded.");
 
         Helper.ConsoleCommands.Add("/prompt", "Prompts the internal LLM", Prompt);
@@ -102,4 +154,5 @@ internal sealed class ModEntry : Mod
             }
         });
     }
+    */
 }

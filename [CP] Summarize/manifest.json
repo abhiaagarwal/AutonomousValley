@@ -1,0 +1,12 @@
+{
+    "$schema": "https://smapi.io/schemas/manifest.json",
+    "UniqueID": "purplexpresso.Summarize.CP",
+    "Name": "[CP] Summarize",
+    "Author": "purplexpresso",
+    "Version": "1.0.0",
+    "Description": "Adds additional data to various objects in the game so LLMs have access to more data.",
+    "ContentPackFor": {
+        "UniqueID": "Pathoschild.ContentPatcher",
+        "MinimumVersion": "1.0.0"
+    }
+}
