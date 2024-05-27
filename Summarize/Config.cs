@@ -11,6 +11,6 @@ public sealed class ModConfig
     {
         LLMName = "Phi-3-mini-4k-instruct.Q4_K_M.gguf";
         ContextSize = 4096;
-        TextEmbeddingModel = "all-MiniLM-L6-v2-Q5_K_S.gguf";
+        TextEmbeddingModel = "mxbai-embed-large-v1.Q5_K_M.gguf";
     }
 }
